@@ -1,42 +1,60 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { View, Text, TouchableOpacity, StyleSheet,Button, TextInput, Switch, Platform } from 'react-native';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTodoReducer } from '../redux/todosSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
+import { useNavigation } from '@react-navigation/native';
 
 export default function AddTodo() {
     const [name, setName] = React.useState('');
     const [date, setDate] = React.useState(new Date());
     const [isToday, setIsToday] = React.useState(false);
-    console.log('Fecha: ',date)
+    const listTodos = useSelector(state => state.todos.todos);
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+
+    const AddTodo = async () => {
+        const newTodo = {
+            id: Math.floor(Math.random() * 1000000),
+            text: name,
+            hour: date.toString(),
+            isToday: isToday,
+            isCompleted: false,
+        }
+        try {
+            await AsyncStorage.setItem('@Todos', JSON.stringify([...listTodos, newTodo]));
+            dispatch(addTodoReducer(newTodo));
+            console.log('Todo saved correctly');
+            navigation.goBack();
+        } catch (e) {
+            console.log('Error saving Todo' + e)
+        }
+    }
 
     //for datepicker for android
-    const [mode, setMode] = React.useState('time');
-    const [show, setShow] = React.useState(false);
-    const [text, setText] = React.useState('algo');
-    
+    const [text, setText] = React.useState('Time selected');
     const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS === 'android')
+        const currentDate = selectedDate;
         setDate(currentDate);
-        console.log('fechha',currentDate)
-
         let tempDate = new Date(currentDate);
-        let fDate = tempDate.getDate() + '/' + (tempDate.getMonth()+1) + '/' + tempDate.getFullYear();
-        let fTime = 'Hours'  + tempDate.getHours() + ' | Minutes: ' + tempDate.getMinutes();
+        let fDate = 'Date: ' + tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
+        let fTime =  'Hour: ' + tempDate.getHours() + ':' + tempDate.getMinutes();
+        setText(fDate+ '\n' + fTime);
+    };
 
-        setText(fDate + '\n' + fTime)
-        console.log('fecha selecionada',fDate + '\n' + fTime)
-
-
-
-    }
-    //const onC
     const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    }
-   
+        DateTimePickerAndroid.open({
+        value: date,
+        onChange,
+        mode: currentMode,
+        is24Hour: true,
+        });
+    };
+    const showTimepicker = () => {
+        showMode('time');
+    };
 
     return (
         <View style={styles.container}>
@@ -48,42 +66,35 @@ export default function AddTodo() {
                     placeholder="Add descrioption"
                     placeholderTextColor='#00000030'
                     style={styles.textInput}
-                    onChangeText={(text) => {setName(name)}}
+                    onChangeText={(text) => {setName(text)}}
                 />
             </View>
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputText}> Hour</Text>
 
-                <TouchableOpacity onPress={() => showMode('time')} style={styles.buttonSelect}>
-                    <Text style={{fontSize: 14, fontWeight: 'bold', color: 'white'}}>Select Hour</Text>
+            <View style={styles.inputContainer}>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.inputText}> Hour: </Text>
+                    <Text style={{color: '#a3a3a3', fontSize: 11, fontWeight: 'bold', }}>{text}</Text>
+                </View>
+                <TouchableOpacity onPress={showTimepicker} style={styles.buttonSelect}>
+                    <Text style={{color:'#fff'}}>Show time</Text>
                 </TouchableOpacity>
-                {show &&  (
-                    <DateTimePicker
-                        testID='dateTimePicker'
-                        value={date}
-                        mode={'time'}
-                        is24Hour={true}
-                        onChange={onChange}
-                        style={{width: '80%'}}
-                    />
-                )}
-
             </View>
+
             <View style={styles.inputContainer}>
-                <Text style={styles.inputText}> Today</Text>
-                <Switch 
-                    value={isToday}
-                    onValueChange={(value) => { setIsToday(value)}}
-                />
+                <Text style={[styles.inputText, {top: 11}]}> Today</Text>
+                <View style={{ borderRadius: 5, paddingTop: 0, width: '80%'}}>
+                    <Switch 
+                        value={isToday}
+                        onValueChange={(value) => { setIsToday(value)}}
+                    />
+                </View>
             </View>
 
-            <TouchableOpacity onPress={() => alert('ss')}style={styles.button}>
+            <TouchableOpacity onPress={AddTodo}style={styles.button}>
                 <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 17,}}>Done</Text>
             </TouchableOpacity>
             
-            <Text style={{color: '#00000030'}}>If you today, the task will be considered as tomorrow</Text>
-
-            <Text>{text}</Text>
+            <Text style={{color:'#00000030'}}>If you today, the task will be considered as tomorrow</Text>
         </View>
     )
 }
@@ -132,5 +143,13 @@ const styles = StyleSheet.create({
         height: 40,
         width: '30%',
         borderRadius: 11,
+    },
+    timeSelect:{
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#000',
+        height: 25,
+        width: '55%',
+        borderRadius: 3,
     }
 })
