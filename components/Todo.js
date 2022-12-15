@@ -18,6 +18,7 @@ export default function Todo({
     hour
 
 }) {
+    const [thisTodoIsToday, setThisTodoIsToday] = hour ? React.useState(moment(new Date(hour)).isSame(moment(), 'day')) : React.useState(false);
     const [localHour, setLocalHour] = React.useState(new Date(hour));
     const dispatch = useDispatch();
     const todos = useSelector(state => state.todos.todos);
@@ -45,7 +46,7 @@ export default function Todo({
                     id={id}
                     text={text}
                     isCompleted={isCompleted}
-                    isToday={isToday}
+                    isToday={thisTodoIsToday}
                     hour={hour}
                 />
                 <View>

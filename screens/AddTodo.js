@@ -6,11 +6,13 @@ import { addTodoReducer } from '../redux/todosSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 
 export default function AddTodo() {
     const [name, setName] = React.useState('');
     const [date, setDate] = React.useState(new Date());
     const [isToday, setIsToday] = React.useState(false);
+    const [withAlert, setWithAlert] = React.useState(false);
     const listTodos = useSelector(state => state.todos.todos);
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -19,7 +21,7 @@ export default function AddTodo() {
         const newTodo = {
             id: Math.floor(Math.random() * 1000000),
             text: name,
-            hour: date.toString(),
+            hour: isToday ? date.toISOString() : new Date(date).getTime() + 24 * 60 *60 * 1000,
             isToday: isToday,
             isCompleted: false,
         }
@@ -27,6 +29,9 @@ export default function AddTodo() {
             await AsyncStorage.setItem('@Todos', JSON.stringify([...listTodos, newTodo]));
             dispatch(addTodoReducer(newTodo));
             console.log('Todo saved correctly');
+            if(withAlert) {
+                await scheduleTodoNotifications(newTodo);
+            }
             navigation.goBack();
         } catch (e) {
             console.log('Error saving Todo' + e)
@@ -56,12 +61,31 @@ export default function AddTodo() {
         showMode('time');
     };
 
+    //Funcion to notifications
+    const scheduleTodoNotifications = async (todo) => {
+        const trigger = new Date(todo.hour);
+        try {
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: "It's time!!",
+                    body: todo.text,
+                },
+                trigger,
+            });
+            console.log('Notificacion was schedule');
+        } catch (error) {
+            alert('The notification failed to schedule, make sure the hour is valid');
+        }
+
+    };
+
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>AddTodo</Text>
 
             <View style={styles.inputContainer}>
-                <Text style={styles.inputText}> Name</Text>
+                <Text style={styles.inputText}>Name</Text>
                 <TextInput 
                     placeholder="Add descrioption"
                     placeholderTextColor='#00000030'
@@ -72,29 +96,40 @@ export default function AddTodo() {
 
             <View style={styles.inputContainer}>
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.inputText}> Hour: </Text>
-                    <Text style={{color: '#a3a3a3', fontSize: 11, fontWeight: 'bold', }}>{text}</Text>
+                    <Text style={styles.inputText}>Hour: </Text>
+                    <Text style={{color: '#a3a3a3', fontSize: 11, fontWeight: 'bold', top: 5}}>{text}</Text>
                 </View>
                 <TouchableOpacity onPress={showTimepicker} style={styles.buttonSelect}>
                     <Text style={{color:'#fff'}}>Show time</Text>
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.inputContainer}>
-                <Text style={[styles.inputText, {top: 11}]}> Today</Text>
-                <View style={{ borderRadius: 5, paddingTop: 0, width: '80%'}}>
-                    <Switch 
-                        value={isToday}
-                        onValueChange={(value) => { setIsToday(value)}}
-                    />
+            <View style={[styles.inputContainer, {alignItems: 'center',}]}>
+                <View>
+                    <Text style={styles.inputText}>Today</Text>
+                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '85%'}}>If you today, the task will be considered as tomorrow</Text>
                 </View>
+                <Switch 
+                    value={isToday}
+                    onValueChange={(value) => { setIsToday(value)}}
+                />
             </View>
 
+            <View style={[styles.inputContainer, {alignItems: 'center', }]}>
+                <View>
+                    <Text style={styles.inputText}>Alert</Text>
+                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '85%'}}>You will receive an alert at the time you set fot this reminder</Text>
+                </View>
+                <Switch 
+                        value={withAlert}
+                        onValueChange={(value) => { setWithAlert(value)}}
+                    />
+                
+            </View>
+            
             <TouchableOpacity onPress={AddTodo}style={styles.button}>
                 <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 17,}}>Done</Text>
             </TouchableOpacity>
-            
-            <Text style={{color:'#00000030'}}>If you today, the task will be considered as tomorrow</Text>
         </View>
     )
 }
@@ -124,7 +159,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         justifyContent: 'space-between',
         flexDirection: 'row',
-        paddingBottom: 30
+        paddingBottom: 18
     },
     button: {
         marginTop: 30,
