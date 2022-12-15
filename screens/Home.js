@@ -10,6 +10,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import moment from 'moment';
 import NoTaskTomorrow from '../components/noTask/NoTaskTomorrow';
+import NoTaskToday from '../components/noTask/NoTaskToday';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -134,10 +135,7 @@ return (
                 
             </View>
             : 
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-            <Text>No cuentas con todos agrega uo</Text>
-            <Text>Icon apuntando al add</Text>            
-            </View>
+            <NoTaskToday />
         }
         <TouchableOpacity onPress={() => navigation.navigate('Add')} style={styles.button}>
             <Text style={styles.plus}>+</Text>
