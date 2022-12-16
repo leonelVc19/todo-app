@@ -82,13 +82,16 @@ export default function AddTodo() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>AddTodo</Text>
+            <Text style={styles.title}>Add Todo</Text>
 
             <View style={styles.inputContainer}>
                 <Text style={styles.inputText}>Name</Text>
                 <TextInput 
-                    placeholder="Add descrioption"
-                    placeholderTextColor='#00000030'
+                    placeholder='Add description'
+                    placeholderTextColor='#00000080'
+                    underlineColorAndroid='#000'
+                    blurOnSubmit={true}
+                    autoFocus={true}
                     style={styles.textInput}
                     onChangeText={(text) => {setName(text)}}
                 />
@@ -107,9 +110,11 @@ export default function AddTodo() {
             <View style={[styles.inputContainer, {alignItems: 'center',}]}>
                 <View>
                     <Text style={styles.inputText}>Today</Text>
-                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '85%'}}>If you today, the task will be considered as tomorrow</Text>
+                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '87%'}}>If you today, the task will be considered as tomorrow</Text>
                 </View>
                 <Switch 
+                    thumbColor={"#00B2FF"}
+                    trackColor={{ false: "#D1D1D1", true: "#000" }}
                     value={isToday}
                     onValueChange={(value) => { setIsToday(value)}}
                 />
@@ -118,12 +123,14 @@ export default function AddTodo() {
             <View style={[styles.inputContainer, {alignItems: 'center', }]}>
                 <View>
                     <Text style={styles.inputText}>Alert</Text>
-                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '85%'}}>You will receive an alert at the time you set fot this reminder</Text>
+                    <Text style={{color:'#00000030', fontSize: 12, maxWidth: '90%'}}>You will receive an alert at the time you set fot this reminder</Text>
                 </View>
                 <Switch 
-                        value={withAlert}
-                        onValueChange={(value) => { setWithAlert(value)}}
-                    />
+                    thumbColor={"#00B2FF"}
+                    trackColor={{ false: "#D1D1D1", true: "#000" }}
+                    value={withAlert}
+                    onValueChange={(value) => { setWithAlert(value)}}
+                />
                 
             </View>
             
@@ -138,23 +145,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 30,
-        backgroundColor: '#F2F8FA'
+        backgroundColor: '#fff'
     },
     title: {
         fontSize: 35,
         fontWeight: 'bold',
         marginBottom: 15,
-        marginTop: 10
+        marginTop: 10,
+        paddingTop: 15,
+        paddingBottom: 10,
     },
     inputText: {
         fontSize: 20,
-        fontWeight: '600',
-        lineHeight: 24,
+        fontWeight: '800',
+        lineHeight: 30,
     },
     textInput: {
-        borderBottomColor: '#00000030',
-        borderBottomWidth: 1,
         width: '80%',
+        
+        borderRadius: 7,
+        height: 35,
+        paddingLeft: 5
+        
     },
     inputContainer: {
         justifyContent: 'space-between',

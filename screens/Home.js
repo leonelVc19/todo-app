@@ -11,6 +11,8 @@ import * as Device from 'expo-device';
 import moment from 'moment';
 import NoTaskTomorrow from '../components/noTask/NoTaskTomorrow';
 import NoTaskToday from '../components/noTask/NoTaskToday';
+import NoTask from '../components/noTask/NoTask';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -18,7 +20,6 @@ Notifications.setNotificationHandler({
         shouldPlaySound: true,
         shouldSetBadge: true,
     })
-
 })
 
 export default function Home() {
@@ -58,7 +59,18 @@ export default function Home() {
         }
         getTodos();
         
+        checkFirstLaunch();
+        
     }, []);
+
+    const checkFirstLaunch = async () => {
+        const firstLaunch = await AsyncStorage.getItem('@FirstLaunch');
+        if (firstLaunch) {
+            return;
+        }
+        await AsyncStorage.setItem('@FirstLaunch', 'true');
+        navigation.navigate('Test');
+    }
 
     const handlePress = async () => {
         if (isHidden) {
@@ -106,9 +118,9 @@ export default function Home() {
 
 return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.buttonImage} onPress={() => Alert.alert('TodoApp','Hola soy Komi...')}> 
+        <TouchableOpacity style={styles.buttonImage} onPress={() => navigation.navigate('Test')}> 
             <Image 
-                source={require('../assets/komi.png')}
+                source={require('../assets/iconApp.png')}
                 style={styles.image}
             />
         </TouchableOpacity>
@@ -118,53 +130,63 @@ return (
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                     <Text style={styles.title}>Today</Text>
                     <TouchableOpacity onPress={handlePress} >
-                        <Text style={{color: '#3486f6'}}>{ isHidden ? 'Show Completed' : 'Hide Completed'}</Text>
+                        { isHidden ? 
+                            (  
+                                <View style={{flexDirection: 'row', alignItems: 'center', margin: 4}}>
+                                    <FontAwesome5 name="eye" size={20} color="black"/>
+                                    <Text style={{color: '#000', fontWeight: 'bold', left: 3}}>Show Completed</Text>
+                                </View>
+                            ) 
+                            :  
+                            (
+                                <View style={{flexDirection: 'row', alignItems: 'center', margin: 4}}>
+                                    <FontAwesome5 name="eye-slash" size={18} color="black"/>
+                                    <Text style={{color: 'gray', fontWeight: 'bold', left: 2}}>Hide Completed</Text>
+                                </View>
+                            )
+                        }
                     </TouchableOpacity>
                 </View>
-                { todayTodos.length > 0 
-                    ? <TodoList todosData={todayTodos} />
-                    : <Text>Sin nada para hoy</Text>
-                }
+                <View>
+                    { todayTodos.length > 0 
+                        ? <TodoList todosData={todayTodos} />
+                        : <NoTaskToday />
+                    }
+                </View>
                 <View>
                     <Text style={styles.title}>Tomorrow</Text>
                     { tomorrowTodos.length > 0 
-                        ?  <TodoList todosData={tomorrowTodos} />
+                        ? <TodoList todosData={tomorrowTodos} />
                         : <NoTaskTomorrow />
                     }
                 </View>
                 
             </View>
             : 
-            <NoTaskToday />
+            <NoTask />
         }
-        <TouchableOpacity onPress={() => navigation.navigate('Add')} style={styles.button}>
-            <Text style={styles.plus}>+</Text>
-        </TouchableOpacity>
     </View> 
 );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         paddingTop: 50,
         paddingHorizontal: 20,
         backgroundColor: '#fff'
     },
     image:{
-        width: 50,
-        height: 50,
-        borderRadius: 30,
-        borderWidth: 1,
-        borderColor: '#000',
+        width: 70,
+        height: 70,
+        borderColor: '#00000050',
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 5,
         },
         shadowOpacity: .3,
         shadowRadius: 5,
-        elevation: 5,
+        elevation: 8,
         
     },
     buttonImage: {
@@ -176,29 +198,4 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginTop: 10
     },
-    button: {
-        width: 45,
-        height: 45,
-        borderRadius: 25,
-        backgroundColor: '#000',
-        position: 'absolute',
-        bottom: 50, 
-        right: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: .5,
-        shadowRadius: 5,
-        elevation: 5,
-    },
-    plus: {
-        fontSize: 45,
-        color: '#FFFFFF',
-        position: 'absolute',
-        top: -6,
-        left: 8,
-
-    }
 });

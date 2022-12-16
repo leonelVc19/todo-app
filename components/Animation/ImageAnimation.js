@@ -22,10 +22,8 @@ export const ImageAnimation = ({ children }) => {
         ])
     ).start();
     return (
-        <View style={{ left: '25%', paddingTop: 5}}>
             <Animated.View style={{transform: [{ scale: animatedValue}]}}>
                 {children}
             </Animated.View>
-        </View>
     );
 }
