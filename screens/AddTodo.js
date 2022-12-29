@@ -28,7 +28,6 @@ export default function AddTodo() {
         try {
             await AsyncStorage.setItem('@Todos', JSON.stringify([...listTodos, newTodo]));
             dispatch(addTodoReducer(newTodo));
-            console.log('Todo saved correctly');
             if(withAlert) {
                 await scheduleTodoNotifications(newTodo);
             }
@@ -72,7 +71,6 @@ export default function AddTodo() {
                 },
                 trigger,
             });
-            console.log('Notificacion was schedule');
         } catch (error) {
             alert('The notification failed to schedule, make sure the hour is valid');
         }

@@ -49,7 +49,6 @@ export default function Home() {
                     })
                     if(todoDataFilter !== null) {
                         await AsyncStorage.setItem("@Todos", JSON.stringify(todoDataFilter));
-                        console.log('we delete some passed todo');
                         dispatch(setTodosReducer(todoDataFilter));
                     }
                 }
@@ -99,8 +98,6 @@ export default function Home() {
                 return;
             }
             token = ( await Notifications.getExpoPushTokenAsync()).data;
-            console.log('El token: '+ token)
-
         } else { return;}
         if(Platform.OS === 'android') {
             Notifications.setNotificationChannelAsync('default', {

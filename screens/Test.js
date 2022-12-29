@@ -6,25 +6,25 @@ export default function Test() {
 
     return(
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome to Minima</Text>
+            <Text style={styles.title}>Bienvenido a "Por Hacer"</Text>
             <View style={styles.featureContainer}>
                 <Image style={styles.icon} source={require('../assets/arrows.png')} />
                 <View style={{flex: 1}}>
                     <Text style={styles.subTitle}>Manage Daily Tasks</Text>
-                    <Text style={styles.subHeadline}>Minima is a simple app that helps you to increase your productivity.</Text>
+                    <Text style={styles.subHeadline}>"Por Hacer" is a simple app that helps you to increase your productivity.</Text>
                 </View>
             </View>
             <View style={styles.featureContainer}>
                 <Image style={styles.icon} source={require('../assets/bell.png')} />
                 <View style={{flex: 1}}>
-                    <Text style={styles.subTitle}>Notifications</Text>
+                    <Text style={styles.subTitle}>Notificaciones</Text>
                     <Text style={styles.subHeadline}>Get notified when it's time to do you tasks.</Text>
                 </View>
             </View>
             <View style={styles.featureContainer}>
                 <Image style={styles.icon} source={require('../assets/design.png')} />
                 <View style={{flex: 1}}>
-                    <Text style={styles.subTitle}>Minimal Design</Text>
+                    <Text style={styles.subTitle}>Diseño Minimalista</Text>
                     <Text style={styles.subHeadline}>Enjoy a simple design that allows you to focus only on what you have to do.</Text>
                 </View>
             </View>
@@ -35,8 +35,7 @@ export default function Test() {
     )
 }
 
-const iphoneHeight = Dimensions.get('window').height;
-console.log(iphoneHeight);
+const androidHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
     container: {
@@ -48,7 +47,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: iphoneHeight > 800 ? 70 : 50,
+        marginBottom: androidHeight > 800 ? 70 : 50,
         marginTop: 100,
     },
     subTitle: {
@@ -75,8 +74,8 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     button: {
-        // backgroundColor: '#007AFF',
-        backgroundColor: '#000000',
+        backgroundColor: '#007AFF',
+        //backgroundColor: '#000000',
         height: 50,
         alignItems: 'center',
         justifyContent: 'center',

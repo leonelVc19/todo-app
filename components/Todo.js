@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import Checkbox from './Checkbox';
 import moment from 'moment';
 import { MaterialIcons } from '@expo/vector-icons'
@@ -31,13 +31,26 @@ export default function Todo({
             await AsyncStorage.setItem('@Todos', JSON.stringify(
                 todos.filter(todo => todo.id !== id)
             ));
-            console.log('Todo delete correctly')
 
         } catch (error) {
             console.log(error);
             
         }
     }
+    //Confirme delete
+    const openConfirmationAlert = () => {
+        Alert.alert(
+            'Delete this task.',
+            'Are you sure?',
+            [
+                {text: 'Yes', onPress: () => handleDeleteTodo() },
+                {text: 'No', onPress: () => Alert.alert("This action was cancelled") },
+            ],
+            {
+                canceled: true
+            }
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -63,7 +76,7 @@ export default function Todo({
                 </View>
             </View>
             
-            <TouchableOpacity onPress={handleDeleteTodo} >
+            <TouchableOpacity onPress={openConfirmationAlert} >
                 <MaterialIcons  name='delete-outline' size={24} color='#73737340' style={styles}/>
             </TouchableOpacity>
         </View>
